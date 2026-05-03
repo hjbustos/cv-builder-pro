@@ -186,11 +186,31 @@ export default function App() {
                 </nav>
               </div>
 
-              <div className="mt-auto p-4 bg-slate-50 rounded-lg border border-slate-100 flex flex-col gap-1">
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Formato</p>
-                <div className="flex justify-between items-center">
-                  <p className="text-xs text-text-slate font-bold uppercase">{data.selectedTemplate}</p>
-                  <span className="text-[10px] text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">A4</span>
+              <div className="mt-auto p-4 bg-slate-50 rounded-lg border border-slate-100 flex flex-col gap-3">
+                <div>
+                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">Tamaño de Hoja</p>
+                  <div className="flex bg-white rounded border border-slate-200 p-0.5">
+                    {(['A4', 'Letter'] as const).map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setData({ ...data, pageSize: size })}
+                        className={`flex-1 py-1 rounded text-[10px] font-bold uppercase transition-all ${
+                          data.pageSize === size 
+                          ? 'bg-slate-900 text-white shadow-sm' 
+                          : 'text-slate-400 hover:text-slate-600'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Diseño Seleccionado</p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs text-text-slate font-bold uppercase">{data.selectedTemplate}</p>
+                    <span className="text-[10px] text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">{data.pageSize}</span>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -215,11 +235,11 @@ export default function App() {
 
           {/* Preview Column - Panel Style */}
           {(isLargeScreen || activeTab === 'preview') && (
-            <div className={`flex-1 bg-slate-200 p-8 md:p-12 overflow-y-auto custom-scrollbar flex justify-center items-start print:bg-white print:p-0`}>
+            <div className="preview-container flex-1 bg-slate-200 p-8 md:p-12 overflow-y-auto custom-scrollbar flex justify-center items-start print:bg-white print:p-0">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="print:m-0"
+                className="print:m-0 w-full flex justify-center"
               >
                 <ResumePreview data={data} />
               </motion.div>

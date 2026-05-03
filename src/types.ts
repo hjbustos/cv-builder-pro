@@ -61,6 +61,7 @@ export interface ResumeData {
     website: string;
     phone: string;
   };
+  pageSize: 'A4' | 'Letter';
   selectedTemplate: TemplateId;
   sections: SectionConfig[];
   experience: Experience[];

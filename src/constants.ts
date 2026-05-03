@@ -12,6 +12,7 @@ export const INITIAL_DATA: ResumeData = {
     website: "https://www.linkedin.com/in/elena-valderrama-dev",
     phone: "+34 600 555 111",
   },
+  pageSize: 'A4',
   selectedTemplate: 'geometric',
   sections: [
     { id: 'experience', label: 'Evolución Profesional', visible: true },

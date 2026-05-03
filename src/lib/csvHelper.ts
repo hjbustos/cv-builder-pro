@@ -14,7 +14,8 @@ export const exportToCSV = (data: ResumeData) => {
     V5: data.personalInfo.email,
     V6: data.personalInfo.website,
     V7: data.personalInfo.phone,
-    V8: data.selectedTemplate
+    V8: data.selectedTemplate,
+    V9: data.pageSize
   });
 
   // Sections config
@@ -119,6 +120,7 @@ export const importFromCSV = (csvString: string): ResumeData => {
     certifications: [],
     skills: [],
     events: [],
+    pageSize: 'A4',
     selectedTemplate: 'geometric'
   };
 
@@ -137,6 +139,9 @@ export const importFromCSV = (csvString: string): ResumeData => {
         };
         if (row.V8) {
           newData.selectedTemplate = row.V8 as any;
+        }
+        if (row.V9) {
+          newData.pageSize = row.V9 as any;
         }
         break;
       case 'SECTION':

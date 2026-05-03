@@ -49,11 +49,49 @@
   }
 
   @media print {
-    body { 
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      height: auto !important;
+      overflow: visible !important;
       background: white !important; 
       margin: 0 !important; 
       padding: 0 !important; 
-      -webkit-print-color-adjust: exact;
+    }
+
+    .print-hidden { display: none !important; }
+    
+    #resume-preview { 
+      box-shadow: none !important; 
+      margin: 0 !important; 
+      border: none !important;
+      min-height: 0 !important;
+      background: white !important;
+    }
+
+    /* Target the motion.div and parent containers */
+    main, 
+    .flex-1, 
+    .preview-container { 
+      padding: 0 !important; 
+      height: auto !important; 
+      overflow: visible !important; 
+      display: block !important;
+      width: 100% !important;
+    }
+    
+    .h-full { height: auto !important; }
+
+    /* Ensure layouts using flex still work internally */
+    #resume-preview.flex {
+      display: flex !important;
+    }
+    
+    #resume-preview .flex {
+      display: flex !important;
     }
   }
 }
@@ -63,28 +101,5 @@
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-  @media print {
-    .print-hidden { display: none !important; }
-    
-    #resume-preview { 
-      box-shadow: none !important; 
-      margin: 0 !important; 
-      border: none !important;
-      padding: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-
-    main { 
-      padding: 0 !important; 
-      height: auto !important; 
-      overflow: visible !important; 
-      display: block !important; 
-    }
-    
-    .flex { display: block !important; }
-    .h-full { height: auto !important; }
-  }
 }
 

@@ -31,6 +31,11 @@ const BadgeImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
 };
 
 const ResumePreview: React.FC<Props> = ({ data }) => {
+  const isA4 = data.pageSize === 'A4';
+  const pageWidth = isA4 ? '210mm' : '215.9mm';
+  const pageHeight = isA4 ? '297mm' : '279.4mm';
+  const minHeight = isA4 ? '1110px' : '1040px'; // Approx pixels for min-height
+
   // --- RENDERING HELPERS (SHARED DATA) ---
   
   const SectionTitle = ({ es, en }: { es: string; en: string }) => {
@@ -233,7 +238,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   // --- TEMPLATE WRAPPERS ---
 
   const GeometricLayout = () => (
-    <div className="bg-white p-12 shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] font-sans text-sm text-gray-900 border border-gray-100 relative" id="resume-preview">
+    <div 
+      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none" 
+      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      id="resume-preview"
+    >
       {/* Header */}
       <div className="border-b-2 border-black pb-4 mb-8">
         <h1 className="text-5xl font-bold tracking-tight text-black">{data.personalInfo.fullName}</h1>
@@ -274,7 +283,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   );
 
   const MinimalistLayout = () => (
-    <div className="bg-white p-16 shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] font-serif text-sm text-gray-800 border border-gray-100 relative" id="resume-preview">
+    <div 
+      className="bg-white p-16 shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
+      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      id="resume-preview"
+    >
       <div className="text-center mb-12">
         <h1 className="text-3xl font-light tracking-[0.1em] text-gray-900 mb-4 uppercase">{data.personalInfo.fullName}</h1>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-500 uppercase tracking-widest font-sans">
@@ -296,7 +309,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   );
 
   const ModernLayout = () => (
-    <div className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] font-sans flex border border-gray-100 relative" id="resume-preview">
+    <div 
+      className="bg-white shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none" 
+      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      id="resume-preview"
+    >
       {/* Sidebar */}
       <div className="w-[280px] bg-blue-900 text-white p-10 flex flex-col gap-10">
         <div>
@@ -341,7 +358,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   );
 
   const TechnicalLayout = () => (
-    <div className="bg-white p-12 shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] font-mono text-[13px] text-gray-900 border-4 border-black relative" id="resume-preview">
+    <div 
+      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
+      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      id="resume-preview"
+    >
       {/* Dev Header */}
       <div className="bg-black text-white p-6 mb-10 flex justify-between items-center">
         <div>
@@ -386,12 +407,17 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   return (
     <div className="relative group/resume pt-6">
+      {/* Dynamic @page style for printing */}
+      <style dangerouslySetInnerHTML={{ 
+        __html: `@media print { @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } }` 
+      }} />
+
       {/* Background Page Indicators (Horizontal lines and page numbers) */}
       <div className="absolute inset-0 pointer-events-none print-hidden" style={{ zIndex: 10 }}>
-        <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: '297mm' }}>
+        <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: pageHeight }}>
          <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">Fin de Página 1</span>
         </div>
-        <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: '594mm' }}>
+        <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: `calc(${pageHeight} * 2)` }}>
           <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">Fin de Página 2</span>
         </div>
       </div>
@@ -400,7 +426,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       {renderLayout()}
 
       {/* Footer info for all templates */}
-      <div className="max-w-[210mm] mx-auto mt-4 px-4 pb-8 flex justify-between items-center text-[10px] text-slate-400 font-medium print:hidden">
+      <div className="mx-auto mt-4 px-4 pb-8 flex justify-between items-center text-[10px] text-slate-400 font-medium print:hidden" style={{ maxWidth: pageWidth }}>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 animate-pulse"></span>
           <span>Draft V1.2 - {data.selectedTemplate.toUpperCase()}</span>

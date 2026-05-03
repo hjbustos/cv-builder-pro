@@ -6,7 +6,8 @@
 
 This contains everything you need to run your app locally.
 
-View your app in AI Studio: https://ai.studio/apps/5041f031-a8aa-427a-9c8f-5bed714dbf34
+App create using Google AI Studio, for studing purpuses in the course 
+https://www.coursera.org/professional-certificates/google-ai
 
 ## Run Locally
 

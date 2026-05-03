@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2563eb;
+  --color-header: #0f172a;
+  --color-bg-app: #f1f5f9;
+  --color-border-theme: #e2e8f0;
+  --color-text-slate: #1e293b;
+  --color-text-muted: #64748b;
+  
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Markdown Description Styles */
+.markdown-body ul {
+  list-style-type: disc !important;
+  padding-left: 1.25rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.markdown-body ol {
+  list-style-type: decimal !important;
+  padding-left: 1.25rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25rem !important;
+  display: list-item !important;
+}
+
+.markdown-body p {
+  margin-bottom: 0.5rem !important;
+}
+
+.markdown-body strong {
+  font-weight: 700 !important;
+}
+
+.markdown-body em {
+  font-style: italic !important;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-app text-text-slate antialiased;
+  }
+
+  @media print {
+    body { 
+      background: white !important; 
+      margin: 0 !important; 
+      padding: 0 !important; 
+      -webkit-print-color-adjust: exact;
+    }
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  @media print {
+    .print-hidden { display: none !important; }
+    
+    #resume-preview { 
+      box-shadow: none !important; 
+      margin: 0 !important; 
+      border: none !important;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    main { 
+      padding: 0 !important; 
+      height: auto !important; 
+      overflow: visible !important; 
+      display: block !important; 
+    }
+    
+    .flex { display: block !important; }
+    .h-full { height: auto !important; }
+  }
+}
+

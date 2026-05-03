@@ -239,7 +239,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const GeometricLayout = () => (
     <div 
-      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none" 
+      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none print:p-0" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -257,17 +257,27 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
               CONTACTOS
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-0.5">
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-start min-w-0">
+            <div className="space-y-0.5 text-xs text-gray-600">
               <p>{data.personalInfo.address}</p>
               <p>{data.personalInfo.country}</p>
               <p>{data.personalInfo.city}</p>
             </div>
-            <div className="text-right space-y-0.5">
-              <p><span className="font-bold">Correo electrónico:</span> {data.personalInfo.email}</p>
-              <p><span className="font-bold">Página web:</span></p>
-              <p className="text-blue-700 underline truncate text-xs">{data.personalInfo.website}</p>
-              <p><span className="font-bold">Teléfono:</span> {data.personalInfo.phone}</p>
+            <div className="text-right space-y-1 min-w-0">
+              <p className="flex justify-end items-center gap-2">
+                <span className="font-bold whitespace-nowrap text-xs uppercase text-gray-400">Email:</span> 
+                <span className="break-all">{data.personalInfo.email}</span>
+              </p>
+              {data.personalInfo.website && (
+                <p className="flex justify-end items-center gap-2">
+                  <span className="font-bold whitespace-nowrap text-xs uppercase text-gray-400">Web:</span> 
+                  <span className="text-blue-700 underline break-all">{data.personalInfo.website}</span>
+                </p>
+              )}
+              <p className="flex justify-end items-center gap-2">
+                <span className="font-bold whitespace-nowrap text-xs uppercase text-gray-400">Tel:</span> 
+                <span>{data.personalInfo.phone}</span>
+              </p>
             </div>
           </div>
         </div>
@@ -310,7 +320,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const ModernLayout = () => (
     <div 
-      className="bg-white shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none" 
+      className="bg-white shadow-2xl print:shadow-none mx-auto w-full font-sans flex print:flex border border-gray-100 relative print:border-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -379,11 +389,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8 bg-gray-50 p-4 border border-gray-200">
-         <p><span className="font-bold mr-2">Email:</span> {data.personalInfo.email}</p>
-         <p><span className="font-bold mr-2">Phone:</span> {data.personalInfo.phone}</p>
-         <p><span className="font-bold mr-2">Loc:</span> {data.personalInfo.city}</p>
-         <p className="truncate"><span className="font-bold mr-2">Link:</span> {data.personalInfo.website}</p>
+      <div className="grid grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4 mb-8 bg-gray-50 print:bg-gray-50 p-4 border border-gray-200">
+         <p className="flex gap-2"><span className="font-bold">Email:</span> <span className="break-all">{data.personalInfo.email}</span></p>
+         <p className="flex gap-2"><span className="font-bold">Phone:</span> <span>{data.personalInfo.phone}</span></p>
+         <p className="flex gap-2"><span className="font-bold">Loc:</span> <span>{data.personalInfo.city}</span></p>
+         <p className="flex gap-2 min-w-0"><span className="font-bold">Link:</span> <span className="break-all truncate">{data.personalInfo.website}</span></p>
       </div>
 
       <div className="space-y-1">

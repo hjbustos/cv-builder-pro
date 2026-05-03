@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import { ResumeData, SectionId } from "../types";
-import { translateResumeToEnglish } from "../services/geminiService";
-import { Loader2, Languages } from "lucide-react";
 
 interface Props {
   data: ResumeData;
@@ -32,38 +30,11 @@ const BadgeImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
   );
 };
 
-const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
-  const [language, setLanguage] = useState<'es' | 'en'>('es');
-  const [translatedData, setTranslatedData] = useState<ResumeData | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [translationError, setTranslationError] = useState(false);
-
-  const handleTranslate = async () => {
-    if (language === 'en') return;
-    setLanguage('en');
-    if (!translatedData) {
-      setIsTranslating(true);
-      setTranslationError(false);
-      try {
-        const result = await translateResumeToEnglish(originalData);
-        setTranslatedData(result);
-      } catch (err) {
-        console.error(err);
-        setTranslationError(true);
-        setLanguage('es');
-      } finally {
-        setIsTranslating(false);
-      }
-    }
-  };
-
-  const data = language === 'en' && translatedData ? translatedData : originalData;
-  const t = (es: string, en: string) => language === 'es' ? es : en;
-
+const ResumePreview: React.FC<Props> = ({ data }) => {
   // --- RENDERING HELPERS (SHARED DATA) ---
   
   const SectionTitle = ({ es, en }: { es: string; en: string }) => {
-    const label = t(es, en);
+    const label = es; // Force Spanish as translation is disabled
     const template = data.selectedTemplate;
 
     if (template === 'minimalist') {
@@ -127,7 +98,7 @@ const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
 
               {exp.technologies && (
                  <div className="mb-4">
-                    <p className="font-bold underline mb-1">{t('Tecnologías en uso:', 'Technologies used:')}</p>
+                    <p className="font-bold underline mb-1">Tecnologías en uso:</p>
                     <ul className="list-disc list-inside space-y-0.5">
                       {exp.technologies.map((tech, idx) => (
                         <li key={idx} className="marker:text-black">{tech}</li>
@@ -182,18 +153,18 @@ const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold">{cert.name}</h3>
                 <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>
-                  {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : t("— Sin fecha de caducidad", "— No expiration date")}
+                  {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : "— Sin fecha de caducidad"}
                 </span>
               </div>
               <p className="font-medium text-gray-700">{cert.issuer}</p>
-              {cert.credentialId && <p className="text-xs text-gray-500 mt-1">{t('ID de la credencial:', 'Credential ID:')} {cert.credentialId}</p>}
+              {cert.credentialId && <p className="text-xs text-gray-500 mt-1">ID de la credencial: {cert.credentialId}</p>}
               <div className="flex items-center gap-4 mt-2">
                 {cert.badgeUrl && (
                   <BadgeImage src={cert.badgeUrl} alt={`${cert.name} Badge`} />
                 )}
                 {cert.credentialUrl && (
                   <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-700 underline truncate hover:text-blue-800 transition-colors">
-                     {t('Ver credencial comprobada', 'View verified credential')}
+                     Ver credencial comprobada
                   </a>
                 )}
               </div>
@@ -274,7 +245,7 @@ const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
         <div className="grid grid-cols-[150px_1fr] gap-x-8 break-inside-avoid mb-10">
           <div>
             <div className="bg-black text-white px-3 py-1 font-bold text-xs inline-block w-full uppercase">
-              {t('CONTACTOS', 'CONTACT')}
+              CONTACTOS
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -284,10 +255,10 @@ const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
               <p>{data.personalInfo.city}</p>
             </div>
             <div className="text-right space-y-0.5">
-              <p><span className="font-bold">{t('Correo electrónico:', 'Email:')}</span> {data.personalInfo.email}</p>
-              <p><span className="font-bold">{t('Página web:', 'Website:')}</span></p>
+              <p><span className="font-bold">Correo electrónico:</span> {data.personalInfo.email}</p>
+              <p><span className="font-bold">Página web:</span></p>
               <p className="text-blue-700 underline truncate text-xs">{data.personalInfo.website}</p>
-              <p><span className="font-bold">{t('Teléfono:', 'Phone:')}</span> {data.personalInfo.phone}</p>
+              <p><span className="font-bold">Teléfono:</span> {data.personalInfo.phone}</p>
             </div>
           </div>
         </div>
@@ -414,41 +385,14 @@ const ResumePreview: React.FC<Props> = ({ data: originalData }) => {
   };
 
   return (
-    <div className="relative group/resume pt-12">
-      {/* Language Switcher UI */}
-      <div className="absolute top-0 left-0 right-0 h-12 flex justify-center items-center gap-2 print-hidden border-b border-gray-100 bg-white/80 backdrop-blur-sm z-20 rounded-t-xl overflow-hidden">
-        <div className="flex bg-slate-100 p-1 rounded-full border border-slate-200">
-          <button 
-            onClick={() => setLanguage('es')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'es' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            ES
-          </button>
-          <button 
-            onClick={handleTranslate}
-            disabled={isTranslating}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${language === 'en' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            {isTranslating ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <Languages size={12} />
-            )}
-            EN
-          </button>
-        </div>
-        {translationError && (
-          <p className="text-[10px] text-red-500 font-medium">Error al traducir</p>
-        )}
-      </div>
-
+    <div className="relative group/resume pt-6">
       {/* Background Page Indicators (Horizontal lines and page numbers) */}
       <div className="absolute inset-0 pointer-events-none print-hidden" style={{ zIndex: 10 }}>
         <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: '297mm' }}>
-         <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">{t('Fin de Página 1', 'End of Page 1')}</span>
+         <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">Fin de Página 1</span>
         </div>
         <div className="absolute w-full border-t-2 border-dashed border-red-400 opacity-0 group-hover/resume:opacity-100 transition-opacity" style={{ top: '594mm' }}>
-          <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">{t('Fin de Página 2', 'End of Page 2')}</span>
+          <span className="absolute right-0 -top-6 bg-red-400 text-white text-[10px] px-2 py-0.5 rounded-l font-bold italic tracking-widest uppercase">Fin de Página 2</span>
         </div>
       </div>
 

@@ -110,15 +110,18 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
                 <ReactMarkdown>{exp.description}</ReactMarkdown>
               </div>
 
-              {exp.technologies && (
-                 <div className="mb-4">
-                    <p className="font-bold underline mb-1">Tecnologías en uso:</p>
-                    <ul className="list-disc list-inside space-y-0.5">
-                      {exp.technologies.map((tech, idx) => (
-                        <li key={idx} className="marker:text-black">{tech}</li>
-                      ))}
-                    </ul>
-                 </div>
+              {exp.technologies && exp.technologies.length > 0 && (
+                <div className="mb-4">
+                  <p className="font-bold underline mb-2 text-xs uppercase tracking-wider text-gray-700">Tecnologías en uso:</p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                    {exp.technologies.map((tech, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                        <span className="truncate">{tech}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           ))}

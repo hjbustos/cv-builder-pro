@@ -89,6 +89,11 @@
     .print\:grid { display: grid !important; }
     .print\:block { display: block !important; }
     
+    .break-inside-avoid {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
     #resume-preview,
     #resume-preview * {
       overflow: visible !important;

@@ -235,11 +235,11 @@ export default function App() {
 
           {/* Preview Column - Panel Style */}
           {(isLargeScreen || activeTab === 'preview') && (
-            <div className="preview-container flex-1 bg-slate-200 p-8 md:p-12 overflow-y-auto custom-scrollbar flex justify-center items-start print:bg-white print:p-0">
+            <div className="preview-container flex-1 bg-white md:bg-slate-200 p-0 md:p-12 overflow-y-auto custom-scrollbar flex justify-center items-start print:bg-white print:p-0">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="print:m-0 w-full flex justify-center"
+                className="print:m-0 w-full flex justify-center py-6 md:py-0 px-4 md:px-0"
               >
                 <ResumePreview data={data} />
               </motion.div>

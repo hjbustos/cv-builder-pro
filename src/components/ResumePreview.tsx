@@ -84,13 +84,13 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
-            <SectionTitle es="EXPERIENCIA LABORAL" en="WORK EXPERIENCE" />
+            <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />
           </div>
         )}
         <div className="space-y-8 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="EXPERIENCIA LABORAL" en="WORK EXPERIENCE" />}
+          {data.selectedTemplate !== 'geometric' && <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />}
           {data.experience.map((exp) => (
-            <div key={exp.id} className="relative break-inside-avoid">
+            <div key={exp.id} className="relative break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className={`font-bold ${data.selectedTemplate === 'modern' ? 'text-xl text-blue-900' : 'text-lg'}`}>{exp.company}</h3>
                 <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{exp.startDate} — {exp.endDate}</span>
@@ -123,13 +123,13 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
-            <SectionTitle es="EDUCACIÓN" en="EDUCATION" />
+            <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />
           </div>
         )}
         <div className="space-y-6 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="EDUCACIÓN" en="EDUCATION" />}
+          {data.selectedTemplate !== 'geometric' && <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />}
           {data.education.map((edu) => (
-            <div key={edu.id} className="break-inside-avoid">
+            <div key={edu.id} className="break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold text-lg">{edu.degree}</h3>
                 <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{edu.startDate ? `${edu.startDate} — ` : ""}{edu.endDate}</span>
@@ -148,13 +148,13 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
-            <SectionTitle es="LICENCIAS Y CERTIFICACIONES" en="LICENSES & CERTIFICATIONS" />
+            <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />
           </div>
         )}
         <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="LICENCIAS Y CERTIFICACIONES" en="LICENSES & CERTIFICATIONS" />}
+          {data.selectedTemplate !== 'geometric' && <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />}
           {data.certifications.map((cert) => (
-            <div key={cert.id} className="relative break-inside-avoid">
+            <div key={cert.id} className="relative break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold">{cert.name}</h3>
                 <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>
@@ -185,11 +185,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
-            <SectionTitle es="CONOCIMIENTOS TÉCNICOS" en="TECHNICAL SKILLS" />
+            <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />
           </div>
         )}
         <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="CONOCIMIENTOS TÉCNICOS" en="TECHNICAL SKILLS" />}
+          {data.selectedTemplate !== 'geometric' && <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />}
           <div className={`grid ${data.selectedTemplate === 'modern' ? 'grid-cols-2 gap-4' : 'grid-cols-1 gap-4'}`}>
             {data.skills.map((group) => (
               <div key={group.id} className="break-inside-avoid">
@@ -208,11 +208,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
-            <SectionTitle es="CONGRESOS SEMINARIOS Y CONFERENCIAS" en="CONGRESSES SEMINARS & CONFERENCES" />
+            <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />
           </div>
         )}
         <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="CONGRESOS SEMINARIOS Y CONFERENCIAS" en="CONGRESSES SEMINARS & CONFERENCES" />}
+          {data.selectedTemplate !== 'geometric' && <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />}
           {data.events.map((event) => (
              <div key={event.id} className="break-inside-avoid">
                <p className="font-bold mb-1">- {event.title} ({event.date})</p>
@@ -239,7 +239,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const GeometricLayout = () => (
     <div 
-      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none print:p-0" 
+      className="bg-white p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none print:p-0" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -283,18 +283,20 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         </div>
 
         {/* Dynamic Sections */}
-        {data.sections?.filter(s => s.visible).map(s => (
-          <React.Fragment key={s.id}>
-            {renderSection(s.id)}
-          </React.Fragment>
-        ))}
+        <div className="space-y-12">
+          {data.sections?.filter(s => s.visible).map(s => (
+            <React.Fragment key={s.id}>
+              {renderSection(s.id)}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
   );
 
   const MinimalistLayout = () => (
     <div 
-      className="bg-white p-16 shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
+      className="bg-white p-16 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -308,7 +310,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <div className="space-y-2 font-sans">
+      <div className="space-y-12 font-sans">
         {data.sections?.filter(s => s.visible).map(s => (
           <React.Fragment key={s.id}>
             {renderSection(s.id)}
@@ -320,7 +322,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const ModernLayout = () => (
     <div 
-      className="bg-white shadow-2xl print:shadow-none mx-auto w-full font-sans flex print:flex border border-gray-100 relative print:border-none" 
+      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex print:flex border border-gray-100 relative print:border-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -357,7 +359,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 p-12 space-y-1">
+      <div className="flex-1 p-12 space-y-12">
         {data.sections?.filter(s => s.visible).map(s => (
           <React.Fragment key={s.id}>
             {renderSection(s.id)}
@@ -369,7 +371,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const TechnicalLayout = () => (
     <div 
-      className="bg-white p-12 shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
+      className="bg-white p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -396,7 +398,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
          <p className="flex gap-2 min-w-0"><span className="font-bold">Link:</span> <span className="break-all truncate">{data.personalInfo.website}</span></p>
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-12">
         {data.sections?.filter(s => s.visible).map(s => (
           <React.Fragment key={s.id}>
             {renderSection(s.id)}

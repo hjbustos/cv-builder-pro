@@ -194,7 +194,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     <section id="section-experience" className="bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Experiencia Laboral</h2>
+          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Evolución Profesional</h2>
           {!data.sections.find(s => s.id === 'experience')?.visible && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
           )}
@@ -249,7 +249,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     <section id="section-education" className="bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Educación</h2>
+          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Formación Académica</h2>
           {!data.sections.find(s => s.id === 'education')?.visible && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
           )}
@@ -280,7 +280,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     <section id="section-certifications" className="bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Licencias y certificaciones</h2>
+          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Certificaciones Relevantes</h2>
           {!data.sections.find(s => s.id === 'certifications')?.visible && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
           )}
@@ -354,7 +354,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     <section id="section-skills" className="bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Conocimientos Técnicos</h2>
+          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Stack Técnico</h2>
           {!data.sections.find(s => s.id === 'skills')?.visible && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
           )}
@@ -390,7 +390,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     <section id="section-events" className="bg-white rounded-lg">
       <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Eventos / Congresos</h2>
+          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Participación en Eventos</h2>
           {!data.sections.find(s => s.id === 'events')?.visible && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
           )}

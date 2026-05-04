@@ -421,7 +421,10 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
     <div className="relative group/resume pt-6">
       {/* Dynamic @page style for printing */}
       <style dangerouslySetInnerHTML={{ 
-        __html: `@media print { @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } }` 
+        __html: `@media print { 
+          @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } 
+          body { color-scheme: light !important; background: white !important; color: black !important; }
+        }` 
       }} />
 
       {/* Background Page Indicators (Horizontal lines and page numbers) */}

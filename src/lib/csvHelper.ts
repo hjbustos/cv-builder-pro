@@ -18,6 +18,17 @@ export const exportToCSV = (data: ResumeData) => {
     V9: data.pageSize
   });
 
+  // Sort Config
+  if (data.sortConfig) {
+    Object.entries(data.sortConfig).forEach(([key, value]) => {
+      rows.push({
+        Type: 'SORT',
+        V1: key,
+        V2: value
+      });
+    });
+  }
+
   // Sections config
   data.sections.forEach(s => {
     rows.push({
@@ -121,7 +132,14 @@ export const importFromCSV = (csvString: string): ResumeData => {
     skills: [],
     events: [],
     pageSize: 'A4',
-    selectedTemplate: 'geometric'
+    selectedTemplate: 'geometric',
+    sortConfig: {
+      experience: 'date',
+      education: 'date',
+      certifications: 'date',
+      skills: 'manual',
+      events: 'date',
+    }
   };
 
   rows.forEach(row => {
@@ -142,6 +160,11 @@ export const importFromCSV = (csvString: string): ResumeData => {
         }
         if (row.V9) {
           newData.pageSize = row.V9 as any;
+        }
+        break;
+      case 'SORT':
+        if (row.V1 && row.V2) {
+          newData.sortConfig[row.V1 as SectionId] = row.V2 as any;
         }
         break;
       case 'SECTION':

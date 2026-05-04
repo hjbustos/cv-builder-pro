@@ -1,6 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { ResumeData, SectionId } from "../types";
+import { parseToDateValue } from "../lib/dateUtils";
 
 interface Props {
   data: ResumeData;
@@ -79,8 +80,16 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
     );
   };
 
-  const renderExperience = () => (
-    data.experience.length > 0 && (
+  const renderExperience = () => {
+    const sortedExperience = data.sortConfig.experience === 'date'
+      ? [...data.experience].sort((a, b) => {
+          const dateA = parseToDateValue(a.endDate || a.startDate);
+          const dateB = parseToDateValue(b.endDate || b.startDate);
+          return dateB - dateA;
+        })
+      : data.experience;
+
+    return sortedExperience.length > 0 && (
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
@@ -89,7 +98,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         )}
         <div className="space-y-8 flex-1">
           {data.selectedTemplate !== 'geometric' && <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />}
-          {data.experience.map((exp) => (
+          {sortedExperience.map((exp) => (
             <div key={exp.id} className="relative break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className={`font-bold ${data.selectedTemplate === 'modern' ? 'text-xl text-blue-900' : 'text-lg'}`}>{exp.company}</h3>
@@ -115,11 +124,19 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
           ))}
         </div>
       </div>
-    )
-  );
+    );
+  };
 
-  const renderEducation = () => (
-    data.education.length > 0 && (
+  const renderEducation = () => {
+    const sortedEducation = data.sortConfig.education === 'date'
+      ? [...data.education].sort((a, b) => {
+          const dateA = parseToDateValue(a.endDate || a.startDate);
+          const dateB = parseToDateValue(b.endDate || b.startDate);
+          return dateB - dateA;
+        })
+      : data.education;
+
+    return sortedEducation.length > 0 && (
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
@@ -128,7 +145,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         )}
         <div className="space-y-6 flex-1">
           {data.selectedTemplate !== 'geometric' && <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />}
-          {data.education.map((edu) => (
+          {sortedEducation.map((edu) => (
             <div key={edu.id} className="break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold text-lg">{edu.degree}</h3>
@@ -140,11 +157,19 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
           ))}
         </div>
       </div>
-    )
-  );
+    );
+  };
 
-  const renderCertifications = () => (
-    data.certifications.length > 0 && (
+  const renderCertifications = () => {
+    const sortedCertifications = data.sortConfig.certifications === 'date'
+      ? [...data.certifications].sort((a, b) => {
+          const dateA = parseToDateValue(a.issueDate);
+          const dateB = parseToDateValue(b.issueDate);
+          return dateB - dateA;
+        })
+      : data.certifications;
+
+    return sortedCertifications.length > 0 && (
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
@@ -153,7 +178,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         )}
         <div className="space-y-4 flex-1">
           {data.selectedTemplate !== 'geometric' && <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />}
-          {data.certifications.map((cert) => (
+          {sortedCertifications.map((cert) => (
             <div key={cert.id} className="relative break-inside-avoid mb-6 last:mb-0">
               <div className="flex justify-between items-baseline mb-1">
                 <h3 className="font-bold">{cert.name}</h3>
@@ -177,11 +202,19 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
           ))}
         </div>
       </div>
-    )
-  );
+    );
+  };
 
-  const renderSkills = () => (
-    data.skills.length > 0 && (
+  const renderSkills = () => {
+    const sortedSkills = data.sortConfig.skills === 'date'
+      ? [...data.skills].sort((a, b) => {
+          // Skills don't really have dates, so maybe alphabetical? 
+          // But the user asked for manual, and if 'date' is selected for skills (unlikely but possible), let's just do alphabetical title
+          return a.title.localeCompare(b.title);
+        })
+      : data.skills;
+
+    return sortedSkills.length > 0 && (
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
@@ -191,7 +224,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         <div className="space-y-4 flex-1">
           {data.selectedTemplate !== 'geometric' && <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />}
           <div className={`grid ${data.selectedTemplate === 'modern' ? 'grid-cols-2 gap-4' : 'grid-cols-1 gap-4'}`}>
-            {data.skills.map((group) => (
+            {sortedSkills.map((group) => (
               <div key={group.id} className="break-inside-avoid">
                 <p className="font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">{group.title}</p>
                 <p className={`leading-relaxed ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{group.items.join(", ")}</p>
@@ -200,11 +233,19 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
           </div>
         </div>
       </div>
-    )
-  );
+    );
+  };
 
-  const renderEvents = () => (
-    data.events.length > 0 && (
+  const renderEvents = () => {
+    const sortedEvents = data.sortConfig.events === 'date'
+      ? [...data.events].sort((a, b) => {
+          const dateA = parseToDateValue(a.date);
+          const dateB = parseToDateValue(b.date);
+          return dateB - dateA;
+        })
+      : data.events;
+
+    return sortedEvents.length > 0 && (
       <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
         {data.selectedTemplate === 'geometric' && (
           <div>
@@ -213,7 +254,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         )}
         <div className="space-y-4 flex-1">
           {data.selectedTemplate !== 'geometric' && <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />}
-          {data.events.map((event) => (
+          {sortedEvents.map((event) => (
              <div key={event.id} className="break-inside-avoid">
                <p className="font-bold mb-1">- {event.title} ({event.date})</p>
                {event.description && <p className="leading-relaxed ml-3 text-gray-600">{event.description}</p>}
@@ -222,7 +263,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         </div>
       </div>
     )
-  );
+  };
 
   const renderSection = (id: SectionId) => {
     switch (id) {

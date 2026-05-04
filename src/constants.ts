@@ -105,4 +105,11 @@ export const INITIAL_DATA: ResumeData = {
       description: "Speaker sobre 'Rendimiento en el Frontend moderno'.",
     },
   ],
+  sortConfig: {
+    experience: 'date',
+    education: 'date',
+    certifications: 'date',
+    skills: 'manual',
+    events: 'date',
+  },
 };

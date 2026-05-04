@@ -44,6 +44,7 @@ export interface Certification {
 
 export type SectionId = 'experience' | 'education' | 'certifications' | 'skills' | 'events';
 export type TemplateId = 'geometric' | 'minimalist' | 'modern' | 'technical';
+export type SortType = 'date' | 'manual';
 
 export interface SectionConfig {
   id: SectionId;
@@ -69,4 +70,5 @@ export interface ResumeData {
   certifications: Certification[];
   skills: SkillGroup[];
   events: Event[];
+  sortConfig: Record<SectionId, SortType>;
 }

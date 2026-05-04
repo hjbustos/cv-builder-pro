@@ -105,6 +105,70 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     onChange({ ...data, sections: newSections });
   };
 
+  const moveItem = (sectionId: keyof ResumeData, index: number, direction: 'up' | 'down') => {
+    const items = [...(data[sectionId] as any[])];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < items.length) {
+      [items[index], items[newIndex]] = [items[newIndex], items[index]];
+      
+      const updates: any = { [sectionId]: items };
+      // Switch to manual if moving items
+      if (data.sortConfig && (sectionId as string) in data.sortConfig) {
+        updates.sortConfig = { ...data.sortConfig, [sectionId]: 'manual' };
+      }
+      
+      onChange({ ...data, ...updates });
+    }
+  };
+
+  const setSortType = (sectionId: keyof ResumeData["sortConfig"], type: 'date' | 'manual') => {
+    onChange({
+      ...data,
+      sortConfig: { ...data.sortConfig, [sectionId]: type }
+    });
+  };
+
+  const SortControls = ({ sectionId }: { sectionId: keyof ResumeData["sortConfig"] }) => (
+    <div className="flex bg-slate-100 p-1 rounded-md mb-2 w-fit">
+      <button 
+        onClick={() => setSortType(sectionId, 'date')}
+        className={`px-3 py-1 text-[10px] font-bold rounded transition-all flex items-center gap-1 ${data.sortConfig[sectionId] === 'date' ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-slate-700'}`}
+      >
+        <ListOrdered size={12} /> FECHA
+      </button>
+      <button 
+        onClick={() => setSortType(sectionId, 'manual')}
+        className={`px-3 py-1 text-[10px] font-bold rounded transition-all flex items-center gap-1 ${data.sortConfig[sectionId] === 'manual' ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-slate-700'}`}
+      >
+        <GripVertical size={12} /> MANUAL
+      </button>
+    </div>
+  );
+
+  const ItemActions = ({ onRemove, onMoveUp, onMoveDown, isFirst, isLast }: { onRemove: () => void, onMoveUp: () => void, onMoveDown: () => void, isFirst: boolean, isLast: boolean }) => (
+    <div className="absolute top-4 right-4 flex items-center gap-2">
+      <div className="flex bg-white rounded border border-slate-200">
+        <button 
+          disabled={isFirst}
+          onClick={onMoveUp}
+          className="p-1 px-1.5 hover:bg-slate-50 disabled:opacity-30 text-slate-400 hover:text-slate-600 transition-colors border-r border-slate-200"
+        >
+          <ChevronUp size={16} />
+        </button>
+        <button 
+          disabled={isLast}
+          onClick={onMoveDown}
+          className="p-1 px-1.5 hover:bg-slate-50 disabled:opacity-30 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <ChevronDown size={16} />
+        </button>
+      </div>
+      <button onClick={onRemove} className="p-1 text-slate-400 hover:text-red-500 transition-colors">
+        <Trash2 size={18} />
+      </button>
+    </div>
+  );
+
   const addExperience = () => {
     const newExp: Experience = {
       id: generateId(),
@@ -192,7 +256,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
 
   const renderExperienceSection = () => (
     <section id="section-experience" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
+      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Evolución Profesional</h2>
           {!data.sections.find(s => s.id === 'experience')?.visible && (
@@ -203,9 +267,10 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
           <Plus size={14} /> Añadir
         </button>
       </div>
-      <div className="space-y-8">
+      <SortControls sectionId="experience" />
+      <div className="space-y-8 mt-4">
         <AnimatePresence>
-          {data.experience.map((exp) => (
+          {data.experience.map((exp, idx) => (
             <motion.div 
               key={exp.id} 
               initial={{ opacity: 0, y: 10 }}
@@ -213,10 +278,14 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
               exit={{ opacity: 0, scale: 0.98 }}
               className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative group"
             >
-              <button onClick={() => removeExperience(exp.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
-                <Trash2 size={18} />
-              </button>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-8">
+              <ItemActions 
+                onRemove={() => removeExperience(exp.id)} 
+                onMoveUp={() => moveItem('experience', idx, 'up')}
+                onMoveDown={() => moveItem('experience', idx, 'down')}
+                isFirst={idx === 0}
+                isLast={idx === data.experience.length - 1}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
                 <InputGroup label="Empresa" value={exp.company} onChange={(v) => updateExperience(exp.id, { company: v })} />
                 <InputGroup label="Cargo" value={exp.position} onChange={(v) => updateExperience(exp.id, { position: v })} />
                 <InputGroup label="Fecha Inicio" value={exp.startDate} onChange={(v) => updateExperience(exp.id, { startDate: v })} />
@@ -247,7 +316,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
 
   const renderEducationSection = () => (
     <section id="section-education" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
+      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Formación Académica</h2>
           {!data.sections.find(s => s.id === 'education')?.visible && (
@@ -258,13 +327,18 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
           <Plus size={14} /> Añadir
         </button>
       </div>
-      <div className="space-y-4">
-        {data.education.map((edu) => (
+      <SortControls sectionId="education" />
+      <div className="space-y-4 mt-4">
+        {data.education.map((edu, idx) => (
           <div key={edu.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <button onClick={() => removeEducation(edu.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
-              <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-8">
+            <ItemActions 
+              onRemove={() => removeEducation(edu.id)} 
+              onMoveUp={() => moveItem('education', idx, 'up')}
+              onMoveDown={() => moveItem('education', idx, 'down')}
+              isFirst={idx === 0}
+              isLast={idx === data.education.length - 1}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
               <InputGroup label="Institución" value={edu.institution} onChange={(v) => updateEducation(edu.id, { institution: v })} />
               <InputGroup label="Título/Grado" value={edu.degree} onChange={(v) => updateEducation(edu.id, { degree: v })} />
               <InputGroup label="Año Inicio (Opcional)" value={edu.startDate} onChange={(v) => updateEducation(edu.id, { startDate: v })} />
@@ -278,7 +352,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
 
   const renderCertificationsSection = () => (
     <section id="section-certifications" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
+      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Certificaciones Relevantes</h2>
           {!data.sections.find(s => s.id === 'certifications')?.visible && (
@@ -289,13 +363,18 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
           <Plus size={14} /> Añadir
         </button>
       </div>
-      <div className="space-y-6">
-        {data.certifications.map((cert) => (
+      <SortControls sectionId="certifications" />
+      <div className="space-y-6 mt-4">
+        {data.certifications.map((cert, idx) => (
           <div key={cert.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <button onClick={() => removeCertification(cert.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
-              <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 gap-6 mr-8">
+            <ItemActions 
+              onRemove={() => removeCertification(cert.id)} 
+              onMoveUp={() => moveItem('certifications', idx, 'up')}
+              onMoveDown={() => moveItem('certifications', idx, 'down')}
+              isFirst={idx === 0}
+              isLast={idx === data.certifications.length - 1}
+            />
+            <div className="grid grid-cols-1 gap-6 mr-16">
               <InputGroup label="Nombre*" value={cert.name} onChange={(v) => updateCertification(cert.id, { name: v })} />
               <InputGroup label="Empresa emisora*" value={cert.issuer} onChange={(v) => updateCertification(cert.id, { issuer: v })} />
               
@@ -352,7 +431,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
 
   const renderSkillsSection = () => (
     <section id="section-skills" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
+      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Stack Técnico</h2>
           {!data.sections.find(s => s.id === 'skills')?.visible && (
@@ -363,16 +442,18 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
           <Plus size={14} /> Añadir Grupo
         </button>
       </div>
-      <div className="space-y-4">
-        {data.skills.map((group) => (
+      <SortControls sectionId="skills" />
+      <div className="space-y-4 mt-4">
+        {data.skills.map((group, idx) => (
           <div key={group.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <button 
-              onClick={() => onChange({ ...data, skills: data.skills.filter(s => s.id !== group.id) })} 
-              className="absolute top-4 right-4 text-slate-400 hover:text-red-500"
-            >
-              <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 gap-6 mr-8">
+            <ItemActions 
+              onRemove={() => onChange({ ...data, skills: data.skills.filter(s => s.id !== group.id) })} 
+              onMoveUp={() => moveItem('skills', idx, 'up')}
+              onMoveDown={() => moveItem('skills', idx, 'down')}
+              isFirst={idx === 0}
+              isLast={idx === data.skills.length - 1}
+            />
+            <div className="grid grid-cols-1 gap-6 mr-16">
               <InputGroup label="Título del Grupo (ej: Lenguajes)" value={group.title} onChange={(v) => updateSkillGroup(group.id, { title: v })} />
               <InputGroup 
                 label="Items (Separados por coma)" 
@@ -388,7 +469,7 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
 
   const renderEventsSection = () => (
     <section id="section-events" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-900">
+      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Participación en Eventos</h2>
           {!data.sections.find(s => s.id === 'events')?.visible && (
@@ -399,16 +480,18 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
           <Plus size={14} /> Añadir Evento
         </button>
       </div>
-      <div className="space-y-4">
-        {data.events.map((event) => (
+      <SortControls sectionId="events" />
+      <div className="space-y-4 mt-4">
+        {data.events.map((event, idx) => (
           <div key={event.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <button 
-              onClick={() => onChange({ ...data, events: data.events.filter(e => e.id !== event.id) })} 
-              className="absolute top-4 right-4 text-slate-400 hover:text-red-500"
-            >
-              <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-8">
+            <ItemActions 
+              onRemove={() => onChange({ ...data, events: data.events.filter(e => e.id !== event.id) })} 
+              onMoveUp={() => moveItem('events', idx, 'up')}
+              onMoveDown={() => moveItem('events', idx, 'down')}
+              isFirst={idx === 0}
+              isLast={idx === data.events.length - 1}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
               <div className="md:col-span-2">
                 <InputGroup label="Título" value={event.title} onChange={(v) => updateEvent(event.id, { title: v })} />
               </div>

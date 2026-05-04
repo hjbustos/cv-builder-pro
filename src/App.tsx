@@ -110,7 +110,7 @@ export default function App() {
               <Download size={14} /> <span>Exportar</span>
             </button>
             <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider bg-slate-800 px-3 py-1.5 rounded cursor-pointer" title="Cargar desde CSV">
-              <Upload size={14} /> <span>Importar</span>
+              <Upload size={14} /> <span>Cargar</span>
               <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
             </label>
           </div>
@@ -224,8 +224,11 @@ export default function App() {
                 <header className="mb-8 block">
                   <h2 className="text-xl font-bold text-slate-900 tracking-tight">Editor de Currículum</h2>
                   <p className="text-sm text-text-muted">Modifica los datos y observa los cambios instantáneamente.</p>
-                  <p className="mt-2 text-[11px] text-primary bg-blue-50 p-2 rounded border border-blue-100 font-medium">
-                    Tip: Si el botón "Exportar PDF" no abre el diálogo, intenta abrir la app en una <strong>pestaña nueva</strong> desde la barra de herramientas superior.
+                  <p className="mt-2 text-[11px] text-primary bg-blue-50 p-3 rounded border border-blue-100 font-medium flex items-center gap-3">
+                    <span className="flex-shrink-0 bg-blue-100 p-1.5 rounded-full"><Info size={14} /></span>
+                    <span>
+                      Tip: Si el botón "Exportar PDF" no abre el diálogo, intenta abrir la app en una <strong>pestaña nueva</strong>.
+                    </span>
                   </p>
                 </header>
                 <ResumeForm data={data} onChange={setData} />

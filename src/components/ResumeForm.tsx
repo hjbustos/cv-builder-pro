@@ -63,6 +63,22 @@ interface Props {
 }
 
 const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
+  const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
+    personal: false,
+    experience: false,
+    education: false,
+    certifications: false,
+    skills: false,
+    events: false,
+  });
+
+  const toggleExpand = (sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
   const handleMarkdownAction = (expId: string, prefix: string, suffix: string = "") => {
     const textarea = document.getElementById(`desc-${expId}`) as HTMLTextAreaElement;
     if (!textarea) return;
@@ -90,21 +106,6 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
     });
   };
 
-  const moveSection = (index: number, direction: 'up' | 'down') => {
-    const newSections = [...data.sections];
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex >= 0 && newIndex < newSections.length) {
-      [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
-      onChange({ ...data, sections: newSections });
-    }
-  };
-
-  const toggleSectionVisibility = (index: number) => {
-    const newSections = [...data.sections];
-    newSections[index].visible = !newSections[index].visible;
-    onChange({ ...data, sections: newSections });
-  };
-
   const moveItem = (sectionId: keyof ResumeData, index: number, direction: 'up' | 'down') => {
     const items = [...(data[sectionId] as any[])];
     const newIndex = direction === 'up' ? index - 1 : index + 1;
@@ -119,6 +120,21 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
       
       onChange({ ...data, ...updates });
     }
+  };
+
+  const moveSection = (index: number, direction: 'up' | 'down') => {
+    const newSections = [...data.sections];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newSections.length) {
+      [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
+      onChange({ ...data, sections: newSections });
+    }
+  };
+
+  const toggleSectionVisibility = (index: number) => {
+    const newSections = [...data.sections];
+    newSections[index] = { ...newSections[index], visible: !newSections[index].visible };
+    onChange({ ...data, sections: newSections });
   };
 
   const setSortType = (sectionId: keyof ResumeData["sortConfig"], type: 'date' | 'manual') => {
@@ -255,254 +271,388 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
   };
 
   const renderExperienceSection = () => (
-    <section id="section-experience" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
+    <section id="section-experience" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div 
+        onClick={() => toggleExpand('experience')}
+        className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+      >
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Evolución Profesional</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Evolución Profesional</h2>
           {!data.sections.find(s => s.id === 'experience')?.visible && (
-            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
+            <span className="text-[10px] bg-white text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-slate-200">Oculto</span>
           )}
         </div>
-        <button onClick={addExperience} className="flex items-center gap-1.5 text-xs bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-bold uppercase tracking-wider">
-          <Plus size={14} /> Añadir
-        </button>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); addExperience(); }} 
+            className="flex items-center gap-1.5 text-[10px] bg-primary text-white px-3 py-1.5 rounded transition-all font-bold uppercase tracking-wider shadow-sm hover:translate-y-[-1px]"
+          >
+            <Plus size={12} /> Añadir
+          </button>
+          <div className={`transition-transform duration-200 ${expandedSections.experience ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
+          </div>
+        </div>
       </div>
-      <SortControls sectionId="experience" />
-      <div className="space-y-8 mt-4">
-        <AnimatePresence>
-          {data.experience.map((exp, idx) => (
-            <motion.div 
-              key={exp.id} 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative group"
-            >
-              <ItemActions 
-                onRemove={() => removeExperience(exp.id)} 
-                onMoveUp={() => moveItem('experience', idx, 'up')}
-                onMoveDown={() => moveItem('experience', idx, 'down')}
-                isFirst={idx === 0}
-                isLast={idx === data.experience.length - 1}
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
-                <InputGroup label="Empresa" value={exp.company} onChange={(v) => updateExperience(exp.id, { company: v })} />
-                <InputGroup label="Cargo" value={exp.position} onChange={(v) => updateExperience(exp.id, { position: v })} />
-                <InputGroup label="Fecha Inicio" value={exp.startDate} onChange={(v) => updateExperience(exp.id, { startDate: v })} />
-                <InputGroup label="Fecha Fin" value={exp.endDate} onChange={(v) => updateExperience(exp.id, { endDate: v })} />
-                <div className="md:col-span-2">
-                  <InputGroup label="Tecnologías (Separadas por coma)" value={exp.technologies?.join(", ") || ""} onChange={(v) => updateExperience(exp.id, { technologies: v.split(",").map(s => s.trim()) })} />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Descripción General (Soporta Markdown)</label>
-                  <MarkdownToolbar 
-                    textareaId={`desc-${exp.id}`} 
-                    onAction={(prefix, suffix) => handleMarkdownAction(exp.id, prefix, suffix)} 
-                  />
-                  <textarea 
-                    id={`desc-${exp.id}`}
-                    className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all h-32 text-sm text-slate-800"
-                    value={exp.description}
-                    onChange={(e) => updateExperience(exp.id, { description: e.target.value })}
-                  />
-                </div>
+      
+      <AnimatePresence>
+        {expandedSections.experience && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6">
+              <SortControls sectionId="experience" />
+              <div className="space-y-8 mt-4">
+                <AnimatePresence>
+                  {data.experience.map((exp, idx) => (
+                    <motion.div 
+                      key={exp.id} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative group"
+                    >
+                      <ItemActions 
+                        onRemove={() => removeExperience(exp.id)} 
+                        onMoveUp={() => moveItem('experience', idx, 'up')}
+                        onMoveDown={() => moveItem('experience', idx, 'down')}
+                        isFirst={idx === 0}
+                        isLast={idx === data.experience.length - 1}
+                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
+                        <InputGroup label="Empresa" value={exp.company} onChange={(v) => updateExperience(exp.id, { company: v })} />
+                        <InputGroup label="Cargo" value={exp.position} onChange={(v) => updateExperience(exp.id, { position: v })} />
+                        <InputGroup label="Fecha Inicio" value={exp.startDate} onChange={(v) => updateExperience(exp.id, { startDate: v })} />
+                        <InputGroup label="Fecha Fin" value={exp.endDate} onChange={(v) => updateExperience(exp.id, { endDate: v })} />
+                        <div className="md:col-span-2">
+                          <InputGroup label="Tecnologías (Separadas por coma)" value={exp.technologies?.join(", ") || ""} onChange={(v) => updateExperience(exp.id, { technologies: v.split(",").map(s => s.trim()) })} />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Descripción General (Soporta Markdown)</label>
+                          <MarkdownToolbar 
+                            textareaId={`desc-${exp.id}`} 
+                            onAction={(prefix, suffix) => handleMarkdownAction(exp.id, prefix, suffix)} 
+                          />
+                          <textarea 
+                            id={`desc-${exp.id}`}
+                            className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all h-32 text-sm text-slate-800"
+                            value={exp.description}
+                            onChange={(e) => updateExperience(exp.id, { description: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 
   const renderEducationSection = () => (
-    <section id="section-education" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
+    <section id="section-education" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div 
+        onClick={() => toggleExpand('education')}
+        className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+      >
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Formación Académica</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Formación Académica</h2>
           {!data.sections.find(s => s.id === 'education')?.visible && (
-            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
+            <span className="text-[10px] bg-white text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-slate-200">Oculto</span>
           )}
         </div>
-        <button onClick={addEducation} className="flex items-center gap-1.5 text-xs bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-bold uppercase tracking-wider">
-          <Plus size={14} /> Añadir
-        </button>
-      </div>
-      <SortControls sectionId="education" />
-      <div className="space-y-4 mt-4">
-        {data.education.map((edu, idx) => (
-          <div key={edu.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <ItemActions 
-              onRemove={() => removeEducation(edu.id)} 
-              onMoveUp={() => moveItem('education', idx, 'up')}
-              onMoveDown={() => moveItem('education', idx, 'down')}
-              isFirst={idx === 0}
-              isLast={idx === data.education.length - 1}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
-              <InputGroup label="Institución" value={edu.institution} onChange={(v) => updateEducation(edu.id, { institution: v })} />
-              <InputGroup label="Título/Grado" value={edu.degree} onChange={(v) => updateEducation(edu.id, { degree: v })} />
-              <InputGroup label="Año Inicio (Opcional)" value={edu.startDate} onChange={(v) => updateEducation(edu.id, { startDate: v })} />
-              <InputGroup label="Año Fin" value={edu.endDate} onChange={(v) => updateEducation(edu.id, { endDate: v })} />
-            </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); addEducation(); }} 
+            className="flex items-center gap-1.5 text-[10px] bg-primary text-white px-3 py-1.5 rounded transition-all font-bold uppercase tracking-wider shadow-sm hover:translate-y-[-1px]"
+          >
+            <Plus size={12} /> Añadir
+          </button>
+          <div className={`transition-transform duration-200 ${expandedSections.education ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
           </div>
-        ))}
+        </div>
       </div>
+
+      <AnimatePresence>
+        {expandedSections.education && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6">
+              <SortControls sectionId="education" />
+              <div className="space-y-4 mt-4">
+                {data.education.map((edu, idx) => (
+                  <div key={edu.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
+                    <ItemActions 
+                      onRemove={() => removeEducation(edu.id)} 
+                      onMoveUp={() => moveItem('education', idx, 'up')}
+                      onMoveDown={() => moveItem('education', idx, 'down')}
+                      isFirst={idx === 0}
+                      isLast={idx === data.education.length - 1}
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
+                      <InputGroup label="Institución" value={edu.institution} onChange={(v) => updateEducation(edu.id, { institution: v })} />
+                      <InputGroup label="Título/Grado" value={edu.degree} onChange={(v) => updateEducation(edu.id, { degree: v })} />
+                      <InputGroup label="Año Inicio (Opcional)" value={edu.startDate} onChange={(v) => updateEducation(edu.id, { startDate: v })} />
+                      <InputGroup label="Año Fin" value={edu.endDate} onChange={(v) => updateEducation(edu.id, { endDate: v })} />
+                      <div className="md:col-span-2">
+                        <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Comentario / Descripción (Opcional)</label>
+                        <textarea 
+                          className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all h-24 text-sm text-slate-800 bg-white"
+                          value={edu.description || ""}
+                          onChange={(e) => updateEducation(edu.id, { description: e.target.value })}
+                          placeholder="Ej: Mención honorífica, promedio sobresaliente, tesis sobre..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 
   const renderCertificationsSection = () => (
-    <section id="section-certifications" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
+    <section id="section-certifications" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div 
+        onClick={() => toggleExpand('certifications')}
+        className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+      >
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Certificaciones Relevantes</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Certificaciones Relevantes</h2>
           {!data.sections.find(s => s.id === 'certifications')?.visible && (
-            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
+            <span className="text-[10px] bg-white text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-slate-200">Oculto</span>
           )}
         </div>
-        <button onClick={addCertification} className="flex items-center gap-1.5 text-xs bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-bold uppercase tracking-wider">
-          <Plus size={14} /> Añadir
-        </button>
-      </div>
-      <SortControls sectionId="certifications" />
-      <div className="space-y-6 mt-4">
-        {data.certifications.map((cert, idx) => (
-          <div key={cert.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <ItemActions 
-              onRemove={() => removeCertification(cert.id)} 
-              onMoveUp={() => moveItem('certifications', idx, 'up')}
-              onMoveDown={() => moveItem('certifications', idx, 'down')}
-              isFirst={idx === 0}
-              isLast={idx === data.certifications.length - 1}
-            />
-            <div className="grid grid-cols-1 gap-6 mr-16">
-              <InputGroup label="Nombre*" value={cert.name} onChange={(v) => updateCertification(cert.id, { name: v })} />
-              <InputGroup label="Empresa emisora*" value={cert.issuer} onChange={(v) => updateCertification(cert.id, { issuer: v })} />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Fecha de expedición</label>
-                  <div className="grid grid-cols-2 gap-2">
-                     <select 
-                       className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                       value={cert.issueDate.month}
-                       onChange={(e) => updateCertification(cert.id, { issueDate: { ...cert.issueDate, month: e.target.value } })}
-                     >
-                       <option value="">Mes</option>
-                       {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-                     </select>
-                     <input 
-                       type="text" placeholder="Año"
-                       className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                       value={cert.issueDate.year}
-                       onChange={(e) => updateCertification(cert.id, { issueDate: { ...cert.issueDate, year: e.target.value } })}
-                     />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Fecha de caducidad</label>
-                  <div className="grid grid-cols-2 gap-2">
-                     <select 
-                       className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                       value={cert.expiryDate.month}
-                       onChange={(e) => updateCertification(cert.id, { expiryDate: { ...cert.expiryDate, month: e.target.value } })}
-                     >
-                       <option value="">Mes</option>
-                       {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-                     </select>
-                     <input 
-                       type="text" placeholder="Año"
-                       className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                       value={cert.expiryDate.year}
-                       onChange={(e) => updateCertification(cert.id, { expiryDate: { ...cert.expiryDate, year: e.target.value } })}
-                     />
-                  </div>
-                </div>
-              </div>
-
-              <InputGroup label="ID de la credencial" value={cert.credentialId || ""} onChange={(v) => updateCertification(cert.id, { credentialId: v })} />
-              <InputGroup label="URL de la credencial" value={cert.credentialUrl || ""} onChange={(v) => updateCertification(cert.id, { credentialUrl: v })} />
-              <InputGroup label="URL del Icono / Badge" value={cert.badgeUrl || ""} onChange={(v) => updateCertification(cert.id, { badgeUrl: v })} />
-            </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); addCertification(); }} 
+            className="flex items-center gap-1.5 text-[10px] bg-primary text-white px-3 py-1.5 rounded transition-all font-bold uppercase tracking-wider shadow-sm hover:translate-y-[-1px]"
+          >
+            <Plus size={12} /> Añadir
+          </button>
+          <div className={`transition-transform duration-200 ${expandedSections.certifications ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
           </div>
-        ))}
+        </div>
       </div>
+      
+      <AnimatePresence>
+        {expandedSections.certifications && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6">
+              <SortControls sectionId="certifications" />
+              <div className="space-y-6 mt-4">
+                {data.certifications.map((cert, idx) => (
+                  <div key={cert.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
+                    <ItemActions 
+                      onRemove={() => removeCertification(cert.id)} 
+                      onMoveUp={() => moveItem('certifications', idx, 'up')}
+                      onMoveDown={() => moveItem('certifications', idx, 'down')}
+                      isFirst={idx === 0}
+                      isLast={idx === data.certifications.length - 1}
+                    />
+                    <div className="grid grid-cols-1 gap-6 mr-16">
+                      <InputGroup label="Nombre*" value={cert.name} onChange={(v) => updateCertification(cert.id, { name: v })} />
+                      <InputGroup label="Empresa emisora*" value={cert.issuer} onChange={(v) => updateCertification(cert.id, { issuer: v })} />
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Fecha de expedición</label>
+                          <div className="grid grid-cols-2 gap-2">
+                             <select 
+                               className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+                               value={cert.issueDate.month}
+                               onChange={(e) => updateCertification(cert.id, { issueDate: { ...cert.issueDate, month: e.target.value } })}
+                             >
+                               <option value="">Mes</option>
+                               {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                             </select>
+                             <input 
+                               type="text" placeholder="Año"
+                               className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+                               value={cert.issueDate.year}
+                               onChange={(e) => updateCertification(cert.id, { issueDate: { ...cert.issueDate, year: e.target.value } })}
+                             />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Fecha de caducidad</label>
+                          <div className="grid grid-cols-2 gap-2">
+                             <select 
+                               className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+                               value={cert.expiryDate.month}
+                               onChange={(e) => updateCertification(cert.id, { expiryDate: { ...cert.expiryDate, month: e.target.value } })}
+                             >
+                               <option value="">Mes</option>
+                               {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                             </select>
+                             <input 
+                               type="text" placeholder="Año"
+                               className="p-2.5 border border-slate-300 rounded text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+                               value={cert.expiryDate.year}
+                               onChange={(e) => updateCertification(cert.id, { expiryDate: { ...cert.expiryDate, year: e.target.value } })}
+                             />
+                          </div>
+                        </div>
+                      </div>
+        
+                      <InputGroup label="ID de la credencial" value={cert.credentialId || ""} onChange={(v) => updateCertification(cert.id, { credentialId: v })} />
+                      <InputGroup label="URL de la credencial" value={cert.credentialUrl || ""} onChange={(v) => updateCertification(cert.id, { credentialUrl: v })} />
+                      <InputGroup label="URL del Icono / Badge" value={cert.badgeUrl || ""} onChange={(v) => updateCertification(cert.id, { badgeUrl: v })} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 
   const renderSkillsSection = () => (
-    <section id="section-skills" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
+    <section id="section-skills" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div 
+        onClick={() => toggleExpand('skills')}
+        className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+      >
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Stack Técnico</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Stack Técnico</h2>
           {!data.sections.find(s => s.id === 'skills')?.visible && (
-            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
+            <span className="text-[10px] bg-white text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-slate-200">Oculto</span>
           )}
         </div>
-        <button onClick={addSkillGroup} className="flex items-center gap-1.5 text-xs bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-bold uppercase tracking-wider">
-          <Plus size={14} /> Añadir Grupo
-        </button>
-      </div>
-      <SortControls sectionId="skills" />
-      <div className="space-y-4 mt-4">
-        {data.skills.map((group, idx) => (
-          <div key={group.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <ItemActions 
-              onRemove={() => onChange({ ...data, skills: data.skills.filter(s => s.id !== group.id) })} 
-              onMoveUp={() => moveItem('skills', idx, 'up')}
-              onMoveDown={() => moveItem('skills', idx, 'down')}
-              isFirst={idx === 0}
-              isLast={idx === data.skills.length - 1}
-            />
-            <div className="grid grid-cols-1 gap-6 mr-16">
-              <InputGroup label="Título del Grupo (ej: Lenguajes)" value={group.title} onChange={(v) => updateSkillGroup(group.id, { title: v })} />
-              <InputGroup 
-                label="Items (Separados por coma)" 
-                value={group.items.join(", ")} 
-                onChange={(v) => updateSkillGroup(group.id, { items: v.split(",").map(s => s.trim()) })} 
-              />
-            </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); addSkillGroup(); }} 
+            className="flex items-center gap-1.5 text-[10px] bg-primary text-white px-3 py-1.5 rounded transition-all font-bold uppercase tracking-wider shadow-sm hover:translate-y-[-1px]"
+          >
+            <Plus size={12} /> Añadir
+          </button>
+          <div className={`transition-transform duration-200 ${expandedSections.skills ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
           </div>
-        ))}
+        </div>
       </div>
+      
+      <AnimatePresence>
+        {expandedSections.skills && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6">
+              <SortControls sectionId="skills" />
+              <div className="space-y-4 mt-4">
+                {data.skills.map((group, idx) => (
+                  <div key={group.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
+                    <ItemActions 
+                      onRemove={() => onChange({ ...data, skills: data.skills.filter(s => s.id !== group.id) })} 
+                      onMoveUp={() => moveItem('skills', idx, 'up')}
+                      onMoveDown={() => moveItem('skills', idx, 'down')}
+                      isFirst={idx === 0}
+                      isLast={idx === data.skills.length - 1}
+                    />
+                    <div className="grid grid-cols-1 gap-6 mr-16">
+                      <InputGroup label="Título del Grupo (ej: Lenguajes)" value={group.title} onChange={(v) => updateSkillGroup(group.id, { title: v })} />
+                      <InputGroup 
+                        label="Items (Separados por coma)" 
+                        value={group.items.join(", ")} 
+                        onChange={(v) => updateSkillGroup(group.id, { items: v.split(",").map(s => s.trim()) })} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 
   const renderEventsSection = () => (
-    <section id="section-events" className="bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-slate-900">
+    <section id="section-events" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div 
+        onClick={() => toggleExpand('events')}
+        className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+      >
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Participación en Eventos</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Participación en Eventos</h2>
           {!data.sections.find(s => s.id === 'events')?.visible && (
-            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Oculto</span>
+            <span className="text-[10px] bg-white text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-slate-200">Oculto</span>
           )}
         </div>
-        <button onClick={addEvent} className="flex items-center gap-1.5 text-xs bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-bold uppercase tracking-wider">
-          <Plus size={14} /> Añadir Evento
-        </button>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); addEvent(); }} 
+            className="flex items-center gap-1.5 text-[10px] bg-primary text-white px-3 py-1.5 rounded transition-all font-bold uppercase tracking-wider shadow-sm hover:translate-y-[-1px]"
+          >
+            <Plus size={12} /> Añadir
+          </button>
+          <div className={`transition-transform duration-200 ${expandedSections.events ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
+          </div>
+        </div>
       </div>
-      <SortControls sectionId="events" />
-      <div className="space-y-4 mt-4">
-        {data.events.map((event, idx) => (
-          <div key={event.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
-            <ItemActions 
-              onRemove={() => onChange({ ...data, events: data.events.filter(e => e.id !== event.id) })} 
-              onMoveUp={() => moveItem('events', idx, 'up')}
-              onMoveDown={() => moveItem('events', idx, 'down')}
-              isFirst={idx === 0}
-              isLast={idx === data.events.length - 1}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
-              <div className="md:col-span-2">
-                <InputGroup label="Título" value={event.title} onChange={(v) => updateEvent(event.id, { title: v })} />
-              </div>
-              <InputGroup label="Fecha" value={event.date} onChange={(v) => updateEvent(event.id, { date: v })} />
-              <div className="md:col-span-2">
-                <InputGroup label="Descripción" value={event.description} onChange={(v) => updateEvent(event.id, { description: v })} />
+      
+      <AnimatePresence>
+        {expandedSections.events && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6">
+              <SortControls sectionId="events" />
+              <div className="space-y-4 mt-4">
+                {data.events.map((event, idx) => (
+                  <div key={event.id} className="p-6 bg-slate-50 rounded-lg border border-slate-200 relative">
+                    <ItemActions 
+                      onRemove={() => onChange({ ...data, events: data.events.filter(e => e.id !== event.id) })} 
+                      onMoveUp={() => moveItem('events', idx, 'up')}
+                      onMoveDown={() => moveItem('events', idx, 'down')}
+                      isFirst={idx === 0}
+                      isLast={idx === data.events.length - 1}
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mr-16">
+                      <div className="md:col-span-2">
+                        <InputGroup label="Título" value={event.title} onChange={(v) => updateEvent(event.id, { title: v })} />
+                      </div>
+                      <InputGroup label="Fecha" value={event.date} onChange={(v) => updateEvent(event.id, { date: v })} />
+                      <div className="md:col-span-2">
+                        <InputGroup label="Descripción" value={event.description} onChange={(v) => updateEvent(event.id, { description: v })} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 
@@ -520,21 +670,41 @@ const ResumeForm: React.FC<Props> = ({ data, onChange }) => {
   return (
     <div className="space-y-10 pb-32">
       {/* Personal Info */}
-      <section id="section-personal" className="bg-white rounded-lg">
-        <h2 className="text-lg font-bold text-slate-900 mb-6 pb-2 border-b-2 border-slate-900 uppercase tracking-tight">
-          Datos Personales
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputGroup label="Nombre Completo" value={data.personalInfo.fullName} onChange={(v) => updatePersonalInfo("fullName", v)} />
-          <InputGroup label="Email" value={data.personalInfo.email} onChange={(v) => updatePersonalInfo("email", v)} />
-          <InputGroup label="Dirección" value={data.personalInfo.address} onChange={(v) => updatePersonalInfo("address", v)} />
-          <InputGroup label="Ciudad" value={data.personalInfo.city} onChange={(v) => updatePersonalInfo("city", v)} />
-          <InputGroup label="País/Región" value={data.personalInfo.country} onChange={(v) => updatePersonalInfo("country", v)} />
-          <InputGroup label="Teléfono" value={data.personalInfo.phone} onChange={(v) => updatePersonalInfo("phone", v)} />
-          <div className="md:col-span-2">
-            <InputGroup label="Sitio Web / LinkedIn" value={data.personalInfo.website} onChange={(v) => updatePersonalInfo("website", v)} />
+      <section id="section-personal" className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+        <div 
+          onClick={() => toggleExpand('personal')}
+          className="flex justify-between items-center p-4 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-200"
+        >
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+            Datos Personales
+          </h2>
+          <div className={`transition-transform duration-200 ${expandedSections.personal ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
           </div>
         </div>
+        
+        <AnimatePresence>
+          {expandedSections.personal && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InputGroup label="Nombre Completo" value={data.personalInfo.fullName} onChange={(v) => updatePersonalInfo("fullName", v)} />
+                <InputGroup label="Email" value={data.personalInfo.email} onChange={(v) => updatePersonalInfo("email", v)} />
+                <InputGroup label="Dirección" value={data.personalInfo.address} onChange={(v) => updatePersonalInfo("address", v)} />
+                <InputGroup label="Ciudad" value={data.personalInfo.city} onChange={(v) => updatePersonalInfo("city", v)} />
+                <InputGroup label="País/Región" value={data.personalInfo.country} onChange={(v) => updatePersonalInfo("country", v)} />
+                <InputGroup label="Teléfono" value={data.personalInfo.phone} onChange={(v) => updatePersonalInfo("phone", v)} />
+                <div className="md:col-span-2">
+                  <InputGroup label="Sitio Web / LinkedIn" value={data.personalInfo.website} onChange={(v) => updatePersonalInfo("website", v)} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* Configuration Section Management */}

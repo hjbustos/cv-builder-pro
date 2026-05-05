@@ -72,6 +72,8 @@
       border: none !important;
       min-height: 0 !important;
       background: white !important;
+      /* Mantener el padding interno para que no se pegue al borde físico del PDF */
+      padding: 1cm !important;
     }
 
     /* Target the motion.div and parent containers */
@@ -96,9 +98,8 @@
       page-break-inside: avoid !important;
     }
 
-    #resume-preview,
-    #resume-preview * {
-      overflow: visible !important;
+    #resume-preview {
+      overflow: hidden !important;
     }
   }
 }

@@ -208,7 +208,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
                 <div className="flex justify-between items-baseline mb-1">
                   <h3 className="font-bold">{cert.name}</h3>
                   <span className={`font-bold whitespace-nowrap ml-4 ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>
-                    {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : "— Sin fecha de caducidad"}
+                    {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : ""}
                   </span>
                 </div>
                 <p className="font-medium text-gray-700">{cert.issuer}</p>

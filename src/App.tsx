@@ -37,26 +37,8 @@ export default function App() {
   }, []);
 
   const handlePrint = () => {
-    const originalTitle = document.title;
-    const fileName = `Curriculum_${data.personalInfo.fullName.replace(/\s+/g, '_')}`;
-    
-    // Cambiar título para el nombre del archivo
-    document.title = fileName;
-    
-    // Pequeño delay para asegurar que el DOM está listo y el título se ha actualizado
-    setTimeout(() => {
-      try {
-        window.print();
-      } catch (e) {
-        console.error("Error al intentar imprimir:", e);
-        alert("El navegador bloqueó la ventana de impresión. Por favor, intenta usar Ctrl+P o abre la aplicación en una pestaña nueva.");
-      }
-      
-      // Restaurar el título original después de que se haya abierto el diálogo
-      setTimeout(() => {
-        document.title = originalTitle;
-      }, 500);
-    }, 100);
+    window.focus();
+    window.print();
   };
 
   const handleExportCSV = () => {
@@ -137,7 +119,7 @@ export default function App() {
             className="bg-primary hover:bg-blue-700 text-white px-5 py-2 rounded font-semibold text-sm transition-all shadow-md active:scale-95 flex items-center gap-2"
           >
             <Printer size={16} />
-            <span>Exportar PDF</span>
+            <span>Imprimir / PDF</span>
           </button>
         </div>
       </header>

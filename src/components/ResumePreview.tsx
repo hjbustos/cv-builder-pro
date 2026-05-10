@@ -2,6 +2,7 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import { ResumeData, SectionId } from "../types";
 import { parseToDateValue } from "../lib/dateUtils";
+import { Printer, ExternalLink } from "lucide-react";
 
 interface Props {
   data: ResumeData;
@@ -38,6 +39,15 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   // Standard A4 aspect ratio pixels for visually correct preview
   const minHeight = isA4 ? '297mm' : '279.4mm'; 
 
+  const handlePrint = () => {
+    try {
+      window.focus();
+      window.print();
+    } catch (e) {
+      console.error("Print failed:", e);
+    }
+  };
+
   // --- RENDERING HELPERS (SHARED DATA) ---
   
   const SectionTitle = ({ es, en }: { es: string; en: string }) => {
@@ -71,7 +81,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
     // Default Geometric
     return (
-      <div className="bg-black text-white px-3 py-1 font-bold text-xs inline-block w-full uppercase">
+      <div className="bg-black text-white px-3 py-1 font-bold text-xs inline-block w-full uppercase leading-tight">
         {label.split(' ').map((word, i) => (
           <React.Fragment key={i}>
             {word}{i < label.split(' ').length - 1 && <br />}
@@ -90,40 +100,44 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         })
       : data.experience;
 
-    return sortedExperience.length > 0 && (
-      <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
-        {data.selectedTemplate === 'geometric' && (
-          <div>
-            <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />
-          </div>
-        )}
-        <div className="space-y-8 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />}
-          {sortedExperience.map((exp) => (
-            <div key={exp.id} className="relative break-inside-avoid mb-6 last:mb-0">
-              <div className="flex justify-between items-baseline mb-1">
-                <h3 className={`font-bold ${data.selectedTemplate === 'modern' ? 'text-xl text-blue-900' : 'text-lg'}`}>{exp.company}</h3>
-                <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{exp.startDate} — {exp.endDate}</span>
-              </div>
-              <p className={`font-medium mb-3 ${data.selectedTemplate === 'minimalist' ? 'italic text-gray-600' : 'text-gray-800'}`}>{exp.position}</p>
-              
-              <div className="markdown-body prose prose-slate max-w-none text-sm leading-relaxed mb-4">
-                <ReactMarkdown>{exp.description}</ReactMarkdown>
-              </div>
+    if (sortedExperience.length === 0) return null;
 
-              {exp.technologies && exp.technologies.length > 0 && (
-                <div className="mb-4">
-                  <p className="font-bold underline mb-2 text-xs uppercase tracking-wider text-gray-700">Tecnologías en uso:</p>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                    {exp.technologies.map((tech, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                        <span className="truncate">{tech}</span>
-                      </div>
-                    ))}
-                  </div>
+    return (
+      <div className="mb-10 print:mb-8">
+        {data.selectedTemplate !== 'geometric' && <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />}
+        <div className="space-y-8">
+          {sortedExperience.map((exp, idx) => (
+            <div key={exp.id} className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : ''} mb-6 last:mb-0`}>
+              {data.selectedTemplate === 'geometric' && (
+                <div className="break-inside-avoid">
+                  {idx === 0 && <SectionTitle es="EVOLUCIÓN PROFESIONAL" en="WORK EXPERIENCE" />}
                 </div>
               )}
+              <div className="break-inside-auto">
+                <div className="flex justify-between items-baseline mb-1">
+                  <h3 className={`font-bold ${data.selectedTemplate === 'modern' ? 'text-xl text-blue-900' : 'text-lg'}`}>{exp.company}</h3>
+                  <span className={`font-bold whitespace-nowrap ml-4 ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{exp.startDate} — {exp.endDate}</span>
+                </div>
+                <p className={`font-medium mb-3 ${data.selectedTemplate === 'minimalist' ? 'italic text-gray-600' : 'text-gray-800'}`}>{exp.position}</p>
+                
+                <div className="markdown-body prose prose-slate max-w-none text-sm leading-relaxed mb-4">
+                  <ReactMarkdown>{exp.description}</ReactMarkdown>
+                </div>
+
+                {exp.technologies && exp.technologies.length > 0 && (
+                  <div className="mb-4 break-inside-avoid">
+                    <p className="font-bold underline mb-2 text-xs uppercase tracking-wider text-gray-700">Tecnologías en uso:</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                      {exp.technologies.map((tech, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-sm text-gray-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                          <span className="break-words">{tech}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -140,23 +154,27 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         })
       : data.education;
 
-    return sortedEducation.length > 0 && (
-      <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
-        {data.selectedTemplate === 'geometric' && (
-          <div>
-            <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />
-          </div>
-        )}
-        <div className="space-y-6 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />}
-          {sortedEducation.map((edu) => (
-            <div key={edu.id} className="break-inside-avoid mb-6 last:mb-0">
-              <div className="flex justify-between items-baseline mb-1">
-                <h3 className="font-bold text-lg">{edu.degree}</h3>
-                <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{edu.startDate ? `${edu.startDate} — ` : ""}{edu.endDate}</span>
+    if (sortedEducation.length === 0) return null;
+
+    return (
+      <div className="mb-10 print:mb-8">
+        {data.selectedTemplate !== 'geometric' && <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />}
+        <div className="space-y-6">
+          {sortedEducation.map((edu, idx) => (
+            <div key={edu.id} className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : ''} break-inside-avoid-page mb-6 last:mb-0`}>
+              {data.selectedTemplate === 'geometric' && (
+                <div>
+                  {idx === 0 && <SectionTitle es="FORMACIÓN ACADÉMICA" en="EDUCATION" />}
+                </div>
+              )}
+              <div>
+                <div className="flex justify-between items-baseline mb-1">
+                  <h3 className="font-bold text-lg">{edu.degree}</h3>
+                  <span className={`font-bold whitespace-nowrap ml-4 ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{edu.startDate ? `${edu.startDate} — ` : ""}{edu.endDate}</span>
+                </div>
+                <p className="font-medium text-gray-700">{edu.institution}</p>
+                {edu.description && <p className="mt-2 leading-relaxed text-gray-600 italic border-l-2 border-gray-100 pl-3">{edu.description}</p>}
               </div>
-              <p className="font-medium text-gray-700">{edu.institution}</p>
-              {edu.description && <p className="mt-2 leading-relaxed text-gray-600 italic border-l-2 border-gray-100 pl-3">{edu.description}</p>}
             </div>
           ))}
         </div>
@@ -173,34 +191,38 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         })
       : data.certifications;
 
-    return sortedCertifications.length > 0 && (
-      <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
-        {data.selectedTemplate === 'geometric' && (
-          <div>
-            <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />
-          </div>
-        )}
-        <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />}
-          {sortedCertifications.map((cert) => (
-            <div key={cert.id} className="relative break-inside-avoid mb-6 last:mb-0">
-              <div className="flex justify-between items-baseline mb-1">
-                <h3 className="font-bold">{cert.name}</h3>
-                <span className={`font-bold ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>
-                  {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : "— Sin fecha de caducidad"}
-                </span>
-              </div>
-              <p className="font-medium text-gray-700">{cert.issuer}</p>
-              {cert.credentialId && <p className="text-xs text-gray-500 mt-1">ID de la credencial: {cert.credentialId}</p>}
-              <div className="flex items-center gap-4 mt-2">
-                {cert.badgeUrl && (
-                  <BadgeImage src={cert.badgeUrl} alt={`${cert.name} Badge`} />
-                )}
-                {cert.credentialUrl && (
-                  <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-700 underline truncate hover:text-blue-800 transition-colors">
-                     Ver credencial comprobada
-                  </a>
-                )}
+    if (sortedCertifications.length === 0) return null;
+
+    return (
+      <div className="mb-10 print:mb-8">
+        {data.selectedTemplate !== 'geometric' && <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />}
+        <div className="space-y-4">
+          {sortedCertifications.map((cert, idx) => (
+            <div key={cert.id} className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : ''} break-inside-avoid-page mb-6 last:mb-0`}>
+              {data.selectedTemplate === 'geometric' && (
+                <div>
+                  {idx === 0 && <SectionTitle es="CERTIFICACIONES RELEVANTES" en="LICENSES & CERTIFICATIONS" />}
+                </div>
+              )}
+              <div>
+                <div className="flex justify-between items-baseline mb-1">
+                  <h3 className="font-bold">{cert.name}</h3>
+                  <span className={`font-bold whitespace-nowrap ml-4 ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>
+                    {cert.issueDate.month} {cert.issueDate.year} {cert.expiryDate.year ? `— ${cert.expiryDate.month} ${cert.expiryDate.year}` : "— Sin fecha de caducidad"}
+                  </span>
+                </div>
+                <p className="font-medium text-gray-700">{cert.issuer}</p>
+                {cert.credentialId && <p className="text-xs text-gray-500 mt-1">ID de la credencial: {cert.credentialId}</p>}
+                <div className="flex items-center gap-4 mt-2">
+                  {cert.badgeUrl && (
+                    <BadgeImage src={cert.badgeUrl} alt={`${cert.name} Badge`} />
+                  )}
+                  {cert.credentialUrl && (
+                    <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-700 underline truncate hover:text-blue-800 transition-colors">
+                       Ver credencial comprobada
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -210,27 +232,30 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   };
 
   const renderSkills = () => {
+    const groupItems = (skills: any[]) => {
+       // Manual order/grouping as provided
+       return skills;
+    };
+    
     const sortedSkills = data.sortConfig.skills === 'date'
-      ? [...data.skills].sort((a, b) => {
-          // Skills don't really have dates, so maybe alphabetical? 
-          // But the user asked for manual, and if 'date' is selected for skills (unlikely but possible), let's just do alphabetical title
-          return a.title.localeCompare(b.title);
-        })
+      ? [...data.skills].sort((a, b) => a.title.localeCompare(b.title))
       : data.skills;
 
-    return sortedSkills.length > 0 && (
-      <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
-        {data.selectedTemplate === 'geometric' && (
-          <div>
-            <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />
-          </div>
-        )}
-        <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />}
-          <div className={`grid ${data.selectedTemplate === 'modern' ? 'grid-cols-2 gap-4' : 'grid-cols-1 gap-4'}`}>
+    if (sortedSkills.length === 0) return null;
+
+    return (
+      <div className="mb-10 print:mb-8">
+        {data.selectedTemplate !== 'geometric' && <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />}
+        <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : ''}`}>
+           {data.selectedTemplate === 'geometric' && (
+             <div>
+               <SectionTitle es="STACK TÉCNICO" en="TECHNICAL SKILLS" />
+             </div>
+           )}
+           <div className={`grid ${data.selectedTemplate === 'modern' ? 'grid-cols-2 gap-4' : 'grid-cols-1 gap-4'}`}>
             {sortedSkills.map((group) => (
-              <div key={group.id} className="break-inside-avoid">
-                <p className="font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">{group.title}</p>
+              <div key={group.id} className="break-inside-avoid-page">
+                <p className="font-bold mb-1 uppercase text-[10px] tracking-wider text-gray-500">{group.title}</p>
                 <p className={`leading-relaxed ${data.selectedTemplate === 'technical' ? 'font-mono text-xs' : ''}`}>{group.items.join(", ")}</p>
               </div>
             ))}
@@ -249,19 +274,23 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         })
       : data.events;
 
-    return sortedEvents.length > 0 && (
-      <div className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : 'flex flex-col'} break-inside-avoid mb-10`}>
-        {data.selectedTemplate === 'geometric' && (
-          <div>
-            <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />
-          </div>
-        )}
-        <div className="space-y-4 flex-1">
-          {data.selectedTemplate !== 'geometric' && <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />}
-          {sortedEvents.map((event) => (
-             <div key={event.id} className="break-inside-avoid">
-               <p className="font-bold mb-1">- {event.title} ({event.date})</p>
-               {event.description && <p className="leading-relaxed ml-3 text-gray-600">{event.description}</p>}
+    if (sortedEvents.length === 0) return null;
+
+    return (
+      <div className="mb-10 print:mb-8">
+        {data.selectedTemplate !== 'geometric' && <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />}
+        <div className="space-y-4">
+          {sortedEvents.map((event, idx) => (
+             <div key={event.id} className={`${data.selectedTemplate === 'geometric' ? 'grid grid-cols-[150px_1fr] gap-x-8' : ''} break-inside-avoid-page mb-4 last:mb-0`}>
+               {data.selectedTemplate === 'geometric' && (
+                 <div>
+                   {idx === 0 && <SectionTitle es="PARTICIPACIÓN EN EVENTOS" en="CONGRESSES SEMINARS & CONFERENCES" />}
+                 </div>
+               )}
+               <div>
+                  <p className="font-bold mb-1">- {event.title} ({event.date})</p>
+                  {event.description && <p className="leading-relaxed ml-3 text-gray-600">{event.description}</p>}
+               </div>
              </div>
            ))}
         </div>
@@ -285,7 +314,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   const GeometricLayout = () => (
     <div 
       className="bg-white p-12 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none" 
-      style={{ width: pageWidth, minHeight: minHeight }}
+      style={{ maxWidth: pageWidth, width: '100%', minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Header */}
@@ -304,9 +333,9 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start min-w-0">
             <div className="space-y-0.5 text-xs text-gray-600 min-w-0">
-              <p className="truncate">{data.personalInfo.address}</p>
-              <p className="truncate">{data.personalInfo.country}</p>
-              <p className="truncate">{data.personalInfo.city}</p>
+              <p className="break-words">{data.personalInfo.address}</p>
+              <p className="break-words">{data.personalInfo.country}</p>
+              <p className="break-words">{data.personalInfo.city}</p>
             </div>
             <div className="text-right space-y-1 min-w-0 md:max-w-[300px]">
               <p className="flex justify-end items-center gap-2 min-w-0">
@@ -342,7 +371,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   const MinimalistLayout = () => (
     <div 
       className="bg-white p-16 print:p-16 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
-      style={{ width: pageWidth, minHeight: minHeight }}
+      style={{ maxWidth: pageWidth, width: '100%', minHeight: minHeight }}
       id="resume-preview"
     >
       <div className="text-center mb-12">
@@ -350,7 +379,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-500 uppercase tracking-widest font-sans max-w-2xl mx-auto">
           <span className="break-all">{data.personalInfo.email}</span>
           <span className="whitespace-nowrap">{data.personalInfo.phone}</span>
-          <span className="truncate">{data.personalInfo.city}, {data.personalInfo.country}</span>
+          <span className="break-words">{data.personalInfo.city}, {data.personalInfo.country}</span>
           <span className="break-all">{data.personalInfo.website}</span>
         </div>
       </div>
@@ -368,11 +397,11 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   const ModernLayout = () => (
     <div 
       className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none" 
-      style={{ width: pageWidth, minHeight: minHeight }}
+      style={{ maxWidth: pageWidth, width: '100%', minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Sidebar - Fixed width that works in print */}
-      <div className="w-[280px] print:w-[65mm] bg-blue-900 text-white p-10 print:p-10 flex flex-col gap-10">
+      <div className="w-[280px] print:w-[74mm] bg-blue-900 text-white p-10 print:p-10 flex flex-col gap-10">
         <div>
           <h1 className="text-2xl font-black uppercase leading-tight mb-2 tracking-tighter">{data.personalInfo.fullName}</h1>
           <p className="text-blue-200 text-xs font-bold uppercase tracking-widest opacity-80">{data.experience[0]?.position || "Profesional"}</p>
@@ -392,7 +421,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
               </p>
               <p className="flex flex-col gap-1 min-w-0">
                 <span className="font-bold text-blue-200">Ubicación</span>
-                <span className="truncate">{data.personalInfo.city}, {data.personalInfo.country}</span>
+                <span className="break-words">{data.personalInfo.city}, {data.personalInfo.country}</span>
               </p>
               <p className="flex flex-col gap-1 min-w-0">
                 <span className="font-bold text-blue-200">LinkedIn/Web</span>
@@ -417,7 +446,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   const TechnicalLayout = () => (
     <div 
       className="bg-white p-12 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
-      style={{ width: pageWidth, minHeight: minHeight }}
+      style={{ maxWidth: pageWidth, width: '100%', minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Dev Header */}
@@ -439,7 +468,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <div className="grid grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4 mb-8 bg-gray-50 print:bg-gray-50 p-4 border border-gray-200">
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Email:</span> <span className="break-all">{data.personalInfo.email}</span></p>
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Phone:</span> <span className="whitespace-nowrap">{data.personalInfo.phone}</span></p>
-         <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Loc:</span> <span className="truncate">{data.personalInfo.city}</span></p>
+         <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Loc:</span> <span className="break-words">{data.personalInfo.city}</span></p>
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Link:</span> <span className="break-all">{data.personalInfo.website}</span></p>
       </div>
 
@@ -469,7 +498,21 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         __html: `@media print { 
           @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } 
           body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; margin: 0 !important; padding: 0 !important; }
-          #resume-preview { width: ${pageWidth} !important; margin: 0 auto !important; position: relative !important; }
+          #resume-preview { 
+            width: ${pageWidth} !important; 
+            min-height: 0 !important;
+            margin: 0 auto !important; 
+            position: relative !important; 
+            box-shadow: none !important;
+            border: none !important;
+          }
+          .break-inside-avoid-page {
+            break-inside: avoid-page;
+            page-break-inside: avoid;
+          }
+          @media print {
+            .grid { display: grid !important; }
+          }
         }` 
       }} />
 

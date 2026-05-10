@@ -288,14 +288,14 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       id="resume-preview"
     >
       {/* Header */}
-      <div className="border-b-2 border-black pb-4 mb-8 flex justify-between items-end gap-6 overflow-hidden">
+      <div className="border-b-2 border-black pb-4 mb-8 flex justify-between items-end gap-6">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-black break-words leading-tight">{data.personalInfo.fullName}</h1>
       </div>
 
       {/* Main Body */}
       <div className="space-y-2">
         {/* Contact info row */}
-        <div className="grid grid-cols-[150px_1fr] gap-x-8 break-inside-avoid mb-10 overflow-hidden">
+        <div className="grid grid-cols-[150px_1fr] gap-x-8 break-inside-avoid mb-10">
           <div>
             <div className="bg-black text-white px-3 py-1 font-bold text-xs inline-block w-full uppercase">
               CONTACTOS
@@ -340,7 +340,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const MinimalistLayout = () => (
     <div 
-      className="bg-white p-16 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
+      className="bg-white p-16 print:p-8 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -366,12 +366,12 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const ModernLayout = () => (
     <div 
-      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex print:flex border border-gray-100 relative print:border-none" 
+      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none print:min-h-0" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
-      {/* Sidebar */}
-      <div className="w-[280px] bg-blue-900 text-white p-10 flex flex-col gap-10">
+      {/* Sidebar - Fixed width that works in print */}
+      <div className="w-[280px] print:w-[70mm] bg-blue-900 text-white p-10 print:p-8 flex flex-col gap-10">
         <div>
           <h1 className="text-2xl font-black uppercase leading-tight mb-2 tracking-tighter">{data.personalInfo.fullName}</h1>
           <p className="text-blue-200 text-xs font-bold uppercase tracking-widest opacity-80">{data.experience[0]?.position || "Profesional"}</p>
@@ -403,7 +403,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 p-12 space-y-12">
+      <div className="flex-1 p-12 print:p-10 space-y-12">
         {data.sections?.filter(s => s.visible).map(s => (
           <React.Fragment key={s.id}>
             {renderSection(s.id)}
@@ -415,7 +415,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const TechnicalLayout = () => (
     <div 
-      className="bg-white p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
+      className="bg-white p-12 print:p-8 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -435,7 +435,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4 mb-8 bg-gray-50 print:bg-gray-50 p-4 border border-gray-200 overflow-hidden">
+      <div className="grid grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-4 mb-8 bg-gray-50 print:bg-gray-50 p-4 border border-gray-200">
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Email:</span> <span className="break-all">{data.personalInfo.email}</span></p>
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Phone:</span> <span className="whitespace-nowrap">{data.personalInfo.phone}</span></p>
          <p className="flex gap-2 min-w-0 text-xs"><span className="font-bold">Loc:</span> <span className="truncate">{data.personalInfo.city}</span></p>
@@ -467,7 +467,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <style dangerouslySetInnerHTML={{ 
         __html: `@media print { 
           @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } 
-          body { color-scheme: light !important; background: white !important; color: black !important; }
+          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }` 
       }} />
 

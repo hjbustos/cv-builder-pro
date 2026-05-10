@@ -35,7 +35,8 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
   const isA4 = data.pageSize === 'A4';
   const pageWidth = isA4 ? '210mm' : '215.9mm';
   const pageHeight = isA4 ? '297mm' : '279.4mm';
-  const minHeight = isA4 ? '1110px' : '1040px'; // Approx pixels for min-height
+  // Standard A4 aspect ratio pixels for visually correct preview
+  const minHeight = isA4 ? '297mm' : '279.4mm'; 
 
   // --- RENDERING HELPERS (SHARED DATA) ---
   
@@ -283,7 +284,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const GeometricLayout = () => (
     <div 
-      className="bg-white p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none" 
+      className="bg-white p-12 print:p-10 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none print:w-full print:max-w-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -340,7 +341,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const MinimalistLayout = () => (
     <div 
-      className="bg-white p-16 print:p-8 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
+      className="bg-white p-16 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none print:w-full print:max-w-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -366,12 +367,12 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const ModernLayout = () => (
     <div 
-      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none print:min-h-0" 
+      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none print:min-h-0 print:w-full print:max-w-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Sidebar - Fixed width that works in print */}
-      <div className="w-[280px] print:w-[70mm] bg-blue-900 text-white p-10 print:p-8 flex flex-col gap-10">
+      <div className="w-[280px] print:w-[65mm] bg-blue-900 text-white p-10 print:p-8 flex flex-col gap-10">
         <div>
           <h1 className="text-2xl font-black uppercase leading-tight mb-2 tracking-tighter">{data.personalInfo.fullName}</h1>
           <p className="text-blue-200 text-xs font-bold uppercase tracking-widest opacity-80">{data.experience[0]?.position || "Profesional"}</p>
@@ -415,7 +416,7 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const TechnicalLayout = () => (
     <div 
-      className="bg-white p-12 print:p-8 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
+      className="bg-white p-12 print:p-10 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black print:w-full print:max-w-none" 
       style={{ maxWidth: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
@@ -467,7 +468,8 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       <style dangerouslySetInnerHTML={{ 
         __html: `@media print { 
           @page { size: ${isA4 ? 'A4' : 'letter'}; margin: 0; } 
-          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; margin: 0 !important; padding: 0 !important; }
+          #resume-preview { width: ${pageWidth} !important; margin: 0 auto !important; position: relative !important; }
         }` 
       }} />
 

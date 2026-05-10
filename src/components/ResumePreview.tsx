@@ -284,8 +284,8 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const GeometricLayout = () => (
     <div 
-      className="bg-white p-12 print:p-10 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none print:w-full print:max-w-none" 
-      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      className="bg-white p-12 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans text-sm text-gray-900 border border-gray-100 relative print:border-none" 
+      style={{ width: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Header */}
@@ -341,8 +341,8 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const MinimalistLayout = () => (
     <div 
-      className="bg-white p-16 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none print:w-full print:max-w-none" 
-      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      className="bg-white p-16 print:p-16 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-serif text-sm text-gray-800 border border-gray-100 relative print:border-none" 
+      style={{ width: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
       <div className="text-center mb-12">
@@ -367,12 +367,12 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const ModernLayout = () => (
     <div 
-      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none print:min-h-0 print:w-full print:max-w-none" 
-      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      className="bg-white shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-sans flex border border-gray-100 relative print:border-none" 
+      style={{ width: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Sidebar - Fixed width that works in print */}
-      <div className="w-[280px] print:w-[65mm] bg-blue-900 text-white p-10 print:p-8 flex flex-col gap-10">
+      <div className="w-[280px] print:w-[65mm] bg-blue-900 text-white p-10 print:p-10 flex flex-col gap-10">
         <div>
           <h1 className="text-2xl font-black uppercase leading-tight mb-2 tracking-tighter">{data.personalInfo.fullName}</h1>
           <p className="text-blue-200 text-xs font-bold uppercase tracking-widest opacity-80">{data.experience[0]?.position || "Profesional"}</p>
@@ -416,8 +416,8 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
 
   const TechnicalLayout = () => (
     <div 
-      className="bg-white p-12 print:p-10 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black print:w-full print:max-w-none" 
-      style={{ maxWidth: pageWidth, minHeight: minHeight }}
+      className="bg-white p-12 print:p-12 shadow-lg md:shadow-2xl print:shadow-none mx-auto w-full font-mono text-[13px] text-gray-900 border-4 border-black relative print:border-black" 
+      style={{ width: pageWidth, minHeight: minHeight }}
       id="resume-preview"
     >
       {/* Dev Header */}
@@ -484,7 +484,16 @@ const ResumePreview: React.FC<Props> = ({ data }) => {
       </div>
 
       {/* Render selected template */}
-      {renderLayout()}
+      <div 
+        className="print:shadow-none print:border-none print:mx-0 print:p-0"
+        style={{ 
+          width: '100%', 
+          display: 'flex', 
+          justifyContent: 'center' 
+        }}
+      >
+        {renderLayout()}
+      </div>
 
       {/* Footer info for all templates */}
       <div className="mx-auto mt-4 px-4 pb-8 flex justify-between items-center text-[10px] text-slate-400 font-medium print:hidden" style={{ maxWidth: pageWidth }}>
